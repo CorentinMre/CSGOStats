@@ -1,28 +1,31 @@
 
-
-
 import requests
 from bs4 import BeautifulSoup
 
+
 class CSGOStats:
     def __init__(self,name) -> None:
-        self.name = name
+        self.name = name.replace(" ","+")
         self.no_error = True
 
         headers = {
                 'connection': 'keep-alive',
                 'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:73.0) Gecko/20100101 Firefox/73.0'}
+        
+        cookies = {
+            "steamCountry":"FR|4a6494567bd2f9b6b4d15922b610cc9e",
+            "steamMachineAuth76561199100442028":"365DCC0FE322A16D5A10272F5FF638FA8104776B",
+            "timezoneOffset":"7200,0",
+            "sessionid":"3ca004dbe6b357f4b5cea95e"
+        }
 
         try:
-            url_for_id = f"https://steamid.io/lookup/{self.name}"
-            site_resp = requests.get(url_for_id)
+
+            steam_url = f"https://steamcommunity.com/search/SearchCommunityAjax?text={self.name}&filter=users&sessionid=3ca004dbe6b357f4b5cea95e&steamid_user=false"
+            site_resp = requests.get(steam_url,headers=headers,cookies=cookies)
             soup_object = BeautifulSoup(site_resp.text, "lxml")
-            steam_id_1 = soup_object.find_all("a")[-2].get("href")
-                
-            site_resp2 = requests.get(steam_id_1)
-            soup_object2 = BeautifulSoup(site_resp2.text, "lxml")
-            self.steam_id = soup_object2.find_all("img",{"class":"ext"})[0].get("data-clipboard-text")
-            
+            self.steam_id = soup_object.find_all("a")[0].get("href").split("/")[-1][:-2]
+
             stats_url = f"https://tracker.gg/csgo/profile/steam/{self.steam_id}/overview"
             site_resp3 = requests.get(stats_url, headers=headers)
             soup_object3 = BeautifulSoup(site_resp3.text, "lxml")
