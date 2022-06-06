@@ -44,18 +44,22 @@ class CSGOStats:
 
 
     def refresh_informations_overview(self) -> None:
+        """Refresh overview informations"""
         self._refresh_informations_overview()
         self.informations_overview = self._get_informations_overview()
     
     def refresh_informations_weapons(self) -> None:
+        """Refresh weapons informations"""
         self._refresh_informations_weapons()
         self.informations_weapons = self._get_informations_weapons()
 
     def refresh_informations_maps(self) -> None:
+        """Refresh maps informations"""
         self._refresh_informations_maps()
         self.informations_maps = self._get_informations_maps()
     
     def refresh_all_informations(self) -> None:
+        """Refresh all informations"""
         self.refresh_informations_overview()
         self.refresh_informations_weapons()
         self.refresh_informations_maps()
@@ -113,8 +117,8 @@ class CSGOStats:
 
 if __name__ == "__main__":
 
-    test = CSGOStats("footsx")
+    player = CSGOStats("footsx")
 
-    print(test.informations_overview)
-    print(test.informations_weapons)
-    print(test.informations_maps)
+    print(player.informations_overview)
+    print(player.informations_weapons)
+    print(player.informations_maps)
