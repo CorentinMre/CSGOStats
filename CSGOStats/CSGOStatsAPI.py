@@ -41,9 +41,6 @@ class CSGOStats:
         site_resp_maps = requests.get(stats_url_maps, headers=self.headers)
         self.soup_object_maps = BeautifulSoup(site_resp_maps.text, "lxml")
 
-        self.informations_overview = self._get_informations_overview()
-        self.informations_weapons = self._get_informations_weapons()
-        self.informations_maps = self._get_informations_maps()
 
 
     def refresh_informations_overview(self) -> None:
