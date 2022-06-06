@@ -23,16 +23,22 @@ class CSGOStats:
         #########OVERVIEW#########
         stats_url_overview = f"https://tracker.gg/csgo/profile/steam/{self.steam_id}/overview"
         site_resp_overview = requests.get(stats_url_overview, headers=self.headers)
+        if site_resp_overview.status_code == 451:
+            raise Exception("This profile hides its game data")
         self.soup_object_overview = BeautifulSoup(site_resp_overview.text, "lxml")
     def _refresh_informations_weapons(self) -> None:
         ########WEAPONS#########
         stats_url_weapons = f"https://tracker.gg/csgo/profile/steam/{self.steam_id}/weapons"
         site_resp_weapons = requests.get(stats_url_weapons, headers=self.headers)
+        if site_resp_weapons.status_code == 451:
+            raise Exception("This profile hides its game data")
         self.soup_object_weapons = BeautifulSoup(site_resp_weapons.text, "lxml")
     def _refresh_informations_maps(self) -> None:
         ########MAPS#########
         stats_url_maps = f"https://tracker.gg/csgo/profile/steam/{self.steam_id}/maps"
         site_resp_maps = requests.get(stats_url_maps, headers=self.headers)
+        if site_resp_maps.status_code == 451:
+            raise Exception("This profile hides its game data")
         self.soup_object_maps = BeautifulSoup(site_resp_maps.text, "lxml")
 
 
