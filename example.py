@@ -20,6 +20,8 @@ player.refresh_all_informations()
 ##########OVERVIEW##########
 print("\n")
 print("Kd: "+player.informations_overview["kd"])
+print("Play time: "+player.informations_overview["playTime"])
+print("Matches number: "+player.informations_overview["matches_nb"])
 print("Headshot: "+player.informations_overview["headshot"])
 print("Wins: "+player.informations_overview["win"])
 print("MVP: "+player.informations_overview["mvp"])
