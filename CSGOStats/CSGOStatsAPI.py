@@ -10,19 +10,13 @@ class CSGOStats:
                 'connection': 'keep-alive',
                 'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:73.0) Gecko/20100101 Firefox/73.0'}
         
-        cookies = {
-            "steamCountry":"FR|4a6494567bd2f9b6b4d15922b610cc9e",
-            "steamMachineAuth76561199100442028":"365DCC0FE322A16D5A10272F5FF638FA8104776B",
-            "timezoneOffset":"7200,0",
-            "sessionid":"3ca004dbe6b357f4b5cea95e"
-        }
-
         ##########GET STEAM ID##########
-        steam_url = f"https://steamcommunity.com/search/SearchCommunityAjax?text={self.name}&filter=users&sessionid=3ca004dbe6b357f4b5cea95e&steamid_user=false"
-        site_resp = requests.get(steam_url,headers=self.headers,cookies=cookies)
+        steam_url = f"https://steamcommunity.com/search/SearchCommunityAjax?text={self.name}&filter=users&sessionid=csgostats&steamid_user=false"
+        site_resp = requests.get(steam_url,headers=self.headers,cookies={"sessionid":"csgostats"})
         soup_object = BeautifulSoup(site_resp.text, "lxml")
         self.steam_id = soup_object.find_all("a")[0].get("href").split("/")[-1][:-2]
-
+        
+        ##########REFRESH ALL INFORMATIONS##########
         self.refresh_all_informations()
     
     def _refresh_informations_overview(self) -> None:
