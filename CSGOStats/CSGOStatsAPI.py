@@ -112,6 +112,7 @@ class CSGOStats:
 if __name__ == "__main__":
 
     player = CSGOStats("footsx")
+    player.refresh_all_informations()
 
     print(player.informations_overview)
     print(player.informations_weapons)
