@@ -18,6 +18,19 @@ Here is an example script:
 import CSGOStats
 
 player = CSGOStats.CSGOStats("Ritchi92")
+player.refresh_all_informations()
+
+"""TO OPTIMIZE
+#If you want to refresh informations
+
+player.refresh_informations_overview()
+player.refresh_informations_weapons()
+player.refresh_informations_maps()
+
+#Or more simply
+
+player.refresh_all_informations()
+"""
 
 
 ##########OVERVIEW##########
