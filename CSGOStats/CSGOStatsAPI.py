@@ -50,13 +50,3 @@ class CSGOStats:
                                 "hostageRescued" : soup_object3.find_all("span", {"class":"value"})[15].text}
         except:
             self.no_error = False
-
-
-
-
-test = CSGOStats("Ritchi92")
-
-if test.no_error:
-    print(test.informations)
-else:
-    print("No information about this person")
