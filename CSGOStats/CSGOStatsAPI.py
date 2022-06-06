@@ -6,7 +6,7 @@ class CSGOStats:
     def __init__(self,name) -> None:
         self.name = name.replace(" ","+")
 
-        headers = {
+        self.headers = {
                 'connection': 'keep-alive',
                 'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:73.0) Gecko/20100101 Firefox/73.0'}
         
@@ -19,25 +19,49 @@ class CSGOStats:
 
         ##########GET STEAM ID##########
         steam_url = f"https://steamcommunity.com/search/SearchCommunityAjax?text={self.name}&filter=users&sessionid=3ca004dbe6b357f4b5cea95e&steamid_user=false"
-        site_resp = requests.get(steam_url,headers=headers,cookies=cookies)
+        site_resp = requests.get(steam_url,headers=self.headers,cookies=cookies)
         soup_object = BeautifulSoup(site_resp.text, "lxml")
         self.steam_id = soup_object.find_all("a")[0].get("href").split("/")[-1][:-2]
+
+        self.refresh_all_informations()
+    
+    def _refresh_informations_overview(self) -> None:
         #########OVERVIEW#########
         stats_url_overview = f"https://tracker.gg/csgo/profile/steam/{self.steam_id}/overview"
-        site_resp_overview = requests.get(stats_url_overview, headers=headers)
+        site_resp_overview = requests.get(stats_url_overview, headers=self.headers)
         self.soup_object_overview = BeautifulSoup(site_resp_overview.text, "lxml")
+    def _refresh_informations_weapons(self) -> None:
         ########WEAPONS#########
         stats_url_weapons = f"https://tracker.gg/csgo/profile/steam/{self.steam_id}/weapons"
-        site_resp_weapons = requests.get(stats_url_weapons, headers=headers)
+        site_resp_weapons = requests.get(stats_url_weapons, headers=self.headers)
         self.soup_object_weapons = BeautifulSoup(site_resp_weapons.text, "lxml")
+    def _refresh_informations_maps(self) -> None:
         ########MAPS#########
         stats_url_maps = f"https://tracker.gg/csgo/profile/steam/{self.steam_id}/maps"
-        site_resp_maps = requests.get(stats_url_maps, headers=headers)
+        site_resp_maps = requests.get(stats_url_maps, headers=self.headers)
         self.soup_object_maps = BeautifulSoup(site_resp_maps.text, "lxml")
 
         self.informations_overview = self._get_informations_overview()
         self.informations_weapons = self._get_informations_weapons()
         self.informations_maps = self._get_informations_maps()
+
+
+    def refresh_informations_overview(self) -> None:
+        self._refresh_informations_overview()
+        self.informations_overview = self._get_informations_overview()
+    
+    def refresh_informations_weapons(self) -> None:
+        self._refresh_informations_weapons()
+        self.informations_weapons = self._get_informations_weapons()
+
+    def refresh_informations_maps(self) -> None:
+        self._refresh_informations_maps()
+        self.informations_maps = self._get_informations_maps()
+    
+    def refresh_all_informations(self) -> None:
+        self.refresh_informations_overview()
+        self.refresh_informations_weapons()
+        self.refresh_informations_maps()
 
     #########OVERVIEW#########
     def _get_informations_overview(self) -> dict:
