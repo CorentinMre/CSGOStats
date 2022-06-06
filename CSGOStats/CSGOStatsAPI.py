@@ -8,7 +8,6 @@ class CSGOStats:
     def __init__(self,name) -> None:
         self.name = name.replace(" ","+")
 
-
         headers = {
                 'connection': 'keep-alive',
                 'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:73.0) Gecko/20100101 Firefox/73.0'}
@@ -38,8 +37,12 @@ class CSGOStats:
         site_resp_maps = requests.get(stats_url_maps, headers=headers)
         self.soup_object_maps = BeautifulSoup(site_resp_maps.text, "lxml")
 
+        self.informations_overview = self._get_informations_overview()
+        self.informations_weapons = self._get_informations_weapons()
+        self.informations_maps = self._get_informations_maps()
+
     #########OVERVIEW#########
-    def get_informations_overview(self) -> dict:
+    def _get_informations_overview(self) -> dict:
         informations_overview = {"avatar" : self.soup_object_overview.find_all("img", {"class":"ph-avatar__image"})[0].get("src"),
                             "kd" : self.soup_object_overview.find_all("span", {"class":"value"})[0].text,
                             "headshot" : self.soup_object_overview.find_all("span", {"class":"value"})[1].text,
@@ -60,7 +63,7 @@ class CSGOStats:
         return informations_overview
 
     #############Weapons#############
-    def get_informations_weapons(self) -> dict:
+    def _get_informations_weapons(self) -> dict:
         nb_weapons = len(self.soup_object_weapons.find_all("tr"))
         informations_weapons = {}
         for i in range(nb_weapons -1):
@@ -76,7 +79,7 @@ class CSGOStats:
 
 
     ###############MAPS##############
-    def get_informations_maps(self) -> dict:
+    def _get_informations_maps(self) -> dict:
         nb_maps = len(self.soup_object_maps.find_all("tr"))
         informations_maps = {}
         for i in range(nb_maps -1):
@@ -90,10 +93,9 @@ class CSGOStats:
 
 
 if __name__ == "__main__":
+
     test = CSGOStats("footsx")
-    if test.no_error:
-        print(test.get_informations_overview())
-        print(test.get_informations_weapons())
-        print(test.get_informations_maps())
-    else:
-        print("No information about this person")
+
+    print(test.informations_overview)
+    print(test.informations_weapons)
+    print(test.informations_maps)
