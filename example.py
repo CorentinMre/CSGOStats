@@ -2,7 +2,7 @@
 from CSGOStats import CSGOStats
 
 
-test = CSGOStats("Ritchi92")
+test = CSGOStats("FootSX")
 
 if test.no_error:
 
@@ -39,10 +39,10 @@ if test.no_error:
 
         ##########MAPS##########
         print("\n\n")
-        print("Url icon map: "+test.informations_maps["Dust"]["Icons"])
-        print("Name of map: "+test.informations_maps["Dust"]["Map"])
-        print("Wins: "+test.informations_maps["Dust"]["Wins"])
-        print("Rounds: "+test.informations_maps["Dust"]["Rounds"])
+        print("Url icon map: "+test.informations_maps["Lake"]["Icons"])
+        print("Name of map: "+test.informations_maps["Lake"]["Map"])
+        print("Wins: "+test.informations_maps["Lake"]["Wins"])
+        print("Rounds: "+test.informations_maps["Lake"]["Rounds"])
 
         
 else:
