@@ -1,6 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
-
+import re
 
 class CSGOStats:
     def __init__(self,name) -> None:
@@ -14,8 +14,8 @@ class CSGOStats:
         steam_url = f"https://steamcommunity.com/search/SearchCommunityAjax?text={self.name}&filter=users&sessionid=csgostats&steamid_user=false"
         site_resp = requests.get(steam_url,headers=self.headers,cookies={"sessionid":"csgostats"})
         soup_object = BeautifulSoup(site_resp.text, "lxml")
-        self.steam_id = soup_object.find_all("a")[0].get("href").split("/")[-1][:-2]
-        
+        self.steam_id = "".join(re.findall('\d', soup_object.find_all("a")[0].get("href"))) #.split("/")[-1][:-2]
+
         ##########REFRESH ALL INFORMATIONS##########
         #self.refresh_all_informations()
     
@@ -64,6 +64,8 @@ class CSGOStats:
     #########OVERVIEW#########
     def _get_informations_overview(self) -> dict:
         informations_overview = {"avatar" : self.soup_object_overview.find_all("img", {"class":"ph-avatar__image"})[0].get("src"),
+                            "playTime" : "".join(re.findall('\d', self.soup_object_overview.find_all("span", {"class":"playtime"})[0].text))+"h",
+                            "matches_nb" : "".join(re.findall('\d', self.soup_object_overview.find_all("span", {"class":"matches"})[0].text)),
                             "kd" : self.soup_object_overview.find_all("span", {"class":"value"})[0].text,
                             "headshot" : self.soup_object_overview.find_all("span", {"class":"value"})[1].text,
                             "win" : self.soup_object_overview.find_all("span", {"class":"value"})[2].text,
@@ -120,3 +122,4 @@ if __name__ == "__main__":
     print(player.informations_overview)
     print(player.informations_weapons)
     print(player.informations_maps)
+    
