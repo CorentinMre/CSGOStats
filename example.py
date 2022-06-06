@@ -41,5 +41,3 @@ print("Url icon map: "+test.informations_maps["Lake"]["Icons"])
 print("Name of map: "+test.informations_maps["Lake"]["Map"])
 print("Wins: "+test.informations_maps["Lake"]["Wins"])
 print("Rounds: "+test.informations_maps["Lake"]["Rounds"])
-
-
