@@ -3,7 +3,19 @@ import CSGOStats
 
 
 player = CSGOStats.CSGOStats("FootSX")
+player.refresh_all_informations()
 
+"""TO OPTIMIZE
+#If you want to refresh informations
+
+player.refresh_informations_overview()
+player.refresh_informations_weapons()
+player.refresh_informations_maps()
+
+#Or more simply
+
+player.refresh_all_informations()
+"""
 
 ##########OVERVIEW##########
 print("\n")
@@ -41,15 +53,3 @@ print("Url icon map: "+player.informations_maps["Lake"]["Icons"])
 print("Name of map: "+player.informations_maps["Lake"]["Map"])
 print("Wins: "+player.informations_maps["Lake"]["Wins"])
 print("Rounds: "+player.informations_maps["Lake"]["Rounds"])
-
-"""
-#If you want to refresh informations
-
-player.refresh_informations_overview()
-player.refresh_informations_weapons()
-player.refresh_informations_maps()
-
-#Or more simply
-
-player.refresh_all_informations()
-"""
