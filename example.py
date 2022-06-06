@@ -1,8 +1,8 @@
 
-from CSGOStats import CSGOStats
+import CSGOStats
 
 
-player = CSGOStats("FootSX")
+player = CSGOStats.CSGOStats("FootSX")
 
 
 ##########OVERVIEW##########
