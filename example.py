@@ -49,7 +49,7 @@ player.refresh_informations_overview()
 player.refresh_informations_weapons()
 player.refresh_informations_maps()
 
-#OR
+#Or more simply
 
 player.refresh_all_informations()
 """
