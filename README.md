@@ -15,9 +15,9 @@
 Here is an example script:
 
 ```python
-from CSGOStats import CSGOStats
+import CSGOStats
 
-player = CSGOStats("Ritchi92")
+player = CSGOStats.CSGOStats("Ritchi92")
 
 
 ##########OVERVIEW##########
