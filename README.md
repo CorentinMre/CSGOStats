@@ -1,4 +1,4 @@
-<p align="center"><img width="250" alt="CSGO Statistics" src="img/icon.png"></p>
+<p align="center"><img width="250" alt="CSGO Statistics" src="img/stat.png"></p>
 <p align="center"><strong>CSGO Statistics</strong>
 <br/>
 
