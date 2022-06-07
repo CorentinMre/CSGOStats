@@ -17,8 +17,10 @@ class CSGOStats:
         self.steam_id = soup_object.find_all("a")[0].get("href").split("/")[-1][:-2]
         
         self.link = f"https://tracker.gg/csgo/profile/steam/{self.steam_id}/overview"
+        
         ##########REFRESH ALL INFORMATIONS##########
         #self.refresh_all_informations()
+        ############################################
     
     def _refresh_informations_overview(self) -> None:
         #########OVERVIEW#########
