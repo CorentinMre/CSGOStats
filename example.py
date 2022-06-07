@@ -37,7 +37,8 @@ print("Bombs planted: "+player.informations_overview["bombsPlanted"])
 print("Bombs defused: "+player.informations_overview["bombsDefused"])
 print("Money earned: "+player.informations_overview["moneyEarned"])
 print("Hostage rescued: "+player.informations_overview["hostageRescued"])
-
+print("Avatar: " +player.informations_overview["avatar"])
+print("Link for more information: " +player.link)
 
 ##########WEAPONS##########
 print("\n\n")
