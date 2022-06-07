@@ -15,7 +15,8 @@ class CSGOStats:
         site_resp = requests.get(steam_url,headers=self.headers,cookies={"sessionid":"csgostats"})
         soup_object = BeautifulSoup(site_resp.text, "lxml")
         self.steam_id = soup_object.find_all("a")[0].get("href").split("/")[-1][:-2]
-
+        
+        self.link = f"https://tracker.gg/csgo/profile/steam/{self.steam_id}/overview"
         ##########REFRESH ALL INFORMATIONS##########
         #self.refresh_all_informations()
     
