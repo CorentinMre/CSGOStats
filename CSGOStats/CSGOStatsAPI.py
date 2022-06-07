@@ -1,6 +1,8 @@
 import requests
+import urllib
 from bs4 import BeautifulSoup
 import re
+import json
 
 class CSGOStats:
     def __init__(self,name) -> None:
@@ -15,114 +17,116 @@ class CSGOStats:
         site_resp = requests.get(steam_url,headers=self.headers,cookies={"sessionid":"csgostats"})
         soup_object = BeautifulSoup(site_resp.text, "lxml")
         self.steam_id = soup_object.find_all("a")[0].get("href").split("/")[-1][:-2]
-        
+
         self.link = f"https://tracker.gg/csgo/profile/steam/{self.steam_id}/overview"
-        
-        ##########REFRESH ALL INFORMATIONS##########
-        #self.refresh_all_informations()
-        ############################################
-    
-    def _refresh_informations_overview(self) -> None:
-        #########OVERVIEW#########
-        stats_url_overview = f"https://tracker.gg/csgo/profile/steam/{self.steam_id}/overview"
-        site_resp_overview = requests.get(stats_url_overview, headers=self.headers)
-        assert not site_resp_overview.status_code == 451, "This profile hides its game data (err: The player either hasn't played CSGO or their profile is private.)"
-        self.soup_object_overview = BeautifulSoup(site_resp_overview.text, "lxml")
-    def _refresh_informations_weapons(self) -> None:
-        ########WEAPONS#########
-        stats_url_weapons = f"https://tracker.gg/csgo/profile/steam/{self.steam_id}/weapons"
-        site_resp_weapons = requests.get(stats_url_weapons, headers=self.headers)
-        assert not site_resp_weapons.status_code == 451, "This profile hides its game data (err: The player either hasn't played CSGO or their profile is private.)"
-        self.soup_object_weapons = BeautifulSoup(site_resp_weapons.text, "lxml")
-    def _refresh_informations_maps(self) -> None:
-        ########MAPS#########
-        stats_url_maps = f"https://tracker.gg/csgo/profile/steam/{self.steam_id}/maps"
-        site_resp_maps = requests.get(stats_url_maps, headers=self.headers)
-        assert not site_resp_maps.status_code == 451, "This profile hides its game data (err: The player either hasn't played CSGO or their profile is private.)"
-        self.soup_object_maps = BeautifulSoup(site_resp_maps.text, "lxml")
+        self.url_overview = f"https://api.tracker.gg/api/v2/csgo/standard/profile/steam/{self.steam_id}"
+        self.url_weapons = f"https://api.tracker.gg/api/v2/csgo/standard/profile/steam/{self.steam_id}/segments/weapon"
+        self.url_maps = f"https://api.tracker.gg/api/v2/csgo/standard/profile/steam/{self.steam_id}/segments/map"
+
+    def _get(self, url:str) -> dict:
+        req = urllib.request.Request(url)
+        req.add_header('User-Agent', 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:73.0) Gecko/20100101 Firefox/73.0')
+        response = urllib.request.urlopen(req)
+        assert not response.getcode() == 451, "The player either hasn't played CSGO or their profile is private."
+        data = response.read()
+        html = json.loads(data.decode('utf-8'))
+        return html["data"]
+
+    def refresh_informations_platformInfo(self) -> dict:
+        """Refresh platform informations"""
+        self.platformInfo = self._get(self.url_overview)["platformInfo"]
 
 
-
-    def refresh_informations_overview(self) -> None:
+    def refresh_informations_overview(self) -> dict:
         """Refresh overview informations"""
-        self._refresh_informations_overview()
-        self.informations_overview = self._get_informations_overview()
-    
-    def refresh_informations_weapons(self) -> None:
-        """Refresh weapons informations"""
-        self._refresh_informations_weapons()
-        self.informations_weapons = self._get_informations_weapons()
+        self.overview = self._get(self.url_overview)["segments"][0]["stats"]
 
-    def refresh_informations_maps(self) -> None:
+    
+    def refresh_informations_weapons(self) -> dict:
+        """Refresh weapons informations"""
+        self.weapons = self._get(self.url_weapons)
+
+    def refresh_informations_maps(self) -> dict:
         """Refresh maps informations"""
-        self._refresh_informations_maps()
-        self.informations_maps = self._get_informations_maps()
+        self.maps = self._get(self.url_maps)
     
     def refresh_all_informations(self) -> None:
         """Refresh all informations"""
+        self.refresh_informations_platformInfo()
         self.refresh_informations_overview()
         self.refresh_informations_weapons()
         self.refresh_informations_maps()
+    
 
-    #########OVERVIEW#########
-    def _get_informations_overview(self) -> dict:
-        informations_overview = {"avatar" : self.soup_object_overview.find_all("img", {"class":"ph-avatar__image"})[0].get("src"),
-                            "playTime" : "".join(re.findall('\d', self.soup_object_overview.find_all("span", {"class":"playtime"})[0].text))+"h",
-                            "matches_nb" : "".join(re.findall('\d', self.soup_object_overview.find_all("span", {"class":"matches"})[0].text)),
-                            "kd" : self.soup_object_overview.find_all("span", {"class":"value"})[0].text,
-                            "headshot" : self.soup_object_overview.find_all("span", {"class":"value"})[1].text,
-                            "win" : self.soup_object_overview.find_all("span", {"class":"value"})[2].text,
-                            "mvp" : self.soup_object_overview.find_all("span", {"class":"value"})[3].text,
-                            "kill" : self.soup_object_overview.find_all("span", {"class":"value"})[4].text,
-                            "deaths" : self.soup_object_overview.find_all("span", {"class":"value"})[5].text,
-                            "headshot_nb" : self.soup_object_overview.find_all("span", {"class":"value"})[6].text,
-                            "win_nb" : self.soup_object_overview.find_all("span", {"class":"value"})[7].text,
-                            "losses_nb" : self.soup_object_overview.find_all("span", {"class":"value"})[8].text,
-                            "score" : self.soup_object_overview.find_all("span", {"class":"value"})[9].text,
-                            "damage" : self.soup_object_overview.find_all("span", {"class":"value"})[10].text,
-                            "shotsAccuracy" : self.soup_object_overview.find_all("span", {"class":"value"})[11].text,
-                            "bombsPlanted" : self.soup_object_overview.find_all("span", {"class":"value"})[12].text,
-                            "bombsDefused" : self.soup_object_overview.find_all("span", {"class":"value"})[13].text,
-                            "moneyEarned" : self.soup_object_overview.find_all("span", {"class":"value"})[14].text,
-                            "hostageRescued" : self.soup_object_overview.find_all("span", {"class":"value"})[15].text}
-        return informations_overview
+"""
 
-    #############Weapons#############
-    def _get_informations_weapons(self) -> dict:
-        nb_weapons = len(self.soup_object_weapons.find_all("tr"))
-        informations_weapons = {}
-        for i in range(nb_weapons -1):
-            temp_weapons = {}
-            temp_weapons["Icons"] = self.soup_object_weapons.find_all("tr")[i+1].find_all("img")[0].get("src")
-            temp_weapons["Weapon"] = self.soup_object_weapons.find_all("tr")[i+1].find_all("span", {"class":"segment-used__tp-name"})[0].text
-            temp_weapons["KillsShots"] = self.soup_object_weapons.find_all("tr")[i+1].find_all("span", {"class":"segment-used__tp-name"})[1].text
-            temp_weapons["FiredShots"] = self.soup_object_weapons.find_all("tr")[i+1].find_all("span", {"class":"segment-used__tp-name"})[2].text
-            temp_weapons["HitShots"] = self.soup_object_weapons.find_all("tr")[i+1].find_all("span", {"class":"segment-used__tp-name"})[3].text
-            temp_weapons["Accuracy"] = self.soup_object_weapons.find_all("tr")[i+1].find_all("span", {"class":"segment-used__tp-name"})[4].text
-            informations_weapons[self.soup_object_weapons.find_all("tr")[i+1].find_all("span", {"class":"segment-used__tp-name"})[0].text] = temp_weapons
-        return informations_weapons
+->self.platformInfo 
+    Return platform informations
+
+    dict with   'platformSlug'
+                'platformUserId'
+                'platformUserHandle'
+                'platformUserIdentifier'
+                'avatarUrl'
 
 
-    ###############MAPS##############
-    def _get_informations_maps(self) -> dict:
-        nb_maps = len(self.soup_object_maps.find_all("tr"))
-        informations_maps = {}
-        for i in range(nb_maps -1):
-            temp_maps = {}
-            temp_maps["Icons"] = self.soup_object_maps.find_all("tr")[i+1].find_all("img")[0].get("src")
-            temp_maps["Map"] = self.soup_object_maps.find_all("tr")[i+1].find_all("span", {"class":"segment-used__tp-name"})[0].text
-            temp_maps["Wins"] = self.soup_object_maps.find_all("tr")[i+1].find_all("span", {"class":"segment-used__tp-name"})[1].text
-            temp_maps["Rounds"] = self.soup_object_maps.find_all("tr")[i+1].find_all("span", {"class":"segment-used__tp-name"})[2].text
-            informations_maps[self.soup_object_maps.find_all("tr")[i+1].find_all("span", {"class":"segment-used__tp-name"})[0].text] = temp_maps
-        return informations_maps
+->self.overview
+    Return overview informations
+
+    dict with   'timePlayed'
+                'score'
+                'kills'
+                'deaths'
+                'kd'
+                'damage'
+                'headshots'
+                'dominations'
+                'shotsFired'
+                'shotsHit'
+                'shotsAccuracy'
+                'snipersKilled'
+                'dominationOverkills'
+                'dominationRevenges'
+                'bombsDefused'
+                'moneyEarned'
+                'hostagesRescued'
+                'mvp'
+                'wins'
+                'ties'
+                'matchesPlayed'
+                'losses'
+                'roundsPlayed'
+                'roundsWon'
+                'wlPercentage'
+                'headshotPct'
 
 
+->self.weapons
+    Return weapons informations
+
+    list of dict with 0
+                      1
+                      2
+                      3
+                      4...
+
+
+->self.maps
+    Return maps informations
+
+    list of dict  0
+                  1
+                  2
+                  3
+                  4...
+        
+"""
 if __name__ == "__main__":
 
     player = CSGOStats("footsx")
     player.refresh_all_informations()
 
-    print(player.informations_overview)
-    print(player.informations_weapons)
-    print(player.informations_maps)
-    
+    print(player.platformInfo)
+    print(player.overview)
+    print(player.weapons)
+    print(player.maps)
