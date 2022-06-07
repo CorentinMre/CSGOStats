@@ -14,7 +14,7 @@ class CSGOStats:
         steam_url = f"https://steamcommunity.com/search/SearchCommunityAjax?text={self.name}&filter=users&sessionid=csgostats&steamid_user=false"
         site_resp = requests.get(steam_url,headers=self.headers,cookies={"sessionid":"csgostats"})
         soup_object = BeautifulSoup(site_resp.text, "lxml")
-        self.steam_id = "".join(re.findall('\d', soup_object.find_all("a")[0].get("href"))) #.split("/")[-1][:-2]
+        self.steam_id = soup_object.find_all("a")[0].get("href").split("/")[-1][:-2]
 
         ##########REFRESH ALL INFORMATIONS##########
         #self.refresh_all_informations()
