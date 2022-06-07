@@ -38,7 +38,6 @@ print("Bombs defused: "+player.informations_overview["bombsDefused"])
 print("Money earned: "+player.informations_overview["moneyEarned"])
 print("Hostage rescued: "+player.informations_overview["hostageRescued"])
 print("Avatar: " +player.informations_overview["avatar"])
-print("Link for more information: " +player.link)
 
 ##########WEAPONS##########
 print("\n\n")
@@ -56,3 +55,5 @@ print("Url icon map: "+player.informations_maps["Lake"]["Icons"])
 print("Name of map: "+player.informations_maps["Lake"]["Map"])
 print("Wins: "+player.informations_maps["Lake"]["Wins"])
 print("Rounds: "+player.informations_maps["Lake"]["Rounds"])
+
+print("Link for more information: " +player.link)
