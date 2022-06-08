@@ -1,6 +1,5 @@
 import CSGOStats
 
-
 player = CSGOStats.CSGOStats("FootSX")
 player.refresh_all_informations()
 
