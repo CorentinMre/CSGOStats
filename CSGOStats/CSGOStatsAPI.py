@@ -42,23 +42,23 @@ class CSGOStats:
             return data.decode("utf-8") 
         else: return  json.loads(data.decode('utf-8'))
 
-    def refresh_informations_platformInfo(self) -> dict:
+    def refresh_informations_platformInfo(self) -> None:
         """Refresh platform informations"""
         self.platformInfo = PlatformInfo(self._get(self.url_overview)["data"]["platformInfo"])
 
 
-    def refresh_informations_overview(self) -> dict:
+    def refresh_informations_overview(self) -> None:
         """Refresh overview informations"""
         self.overview = Overview(self._get(self.url_overview)["data"]["segments"][0]["stats"])
 
-    def refresh_informations_weapons(self) -> dict:
+    def refresh_informations_weapons(self) -> None:
         """Refresh weapons informations"""
         self.weapons = []
         weapons_temp = self._get(self.url_weapons)["data"]
         for i in range(len(weapons_temp)):
             self.weapons.append(Weapons(weapons_temp[i]))
 
-    def refresh_informations_maps(self) -> dict:
+    def refresh_informations_maps(self) -> None:
         """Refresh maps informations"""
         self.maps = []
         maps_temp = self._get(self.url_maps)["data"]
@@ -114,8 +114,8 @@ class Overview:
         self.losses = Values(data["losses"])
         self.roundsPlayed = Values(data["roundsPlayed"])
         self.roundsWon = Values(data["roundsWon"])
-        self.wlPercentage = Values(data["wlPercentage"])
-        self.headshotPct = Values(data["headshotPct"])
+        self.winsPercentage = Values(data["wlPercentage"])
+        self.headshotPercentage = Values(data["headshotPct"])
 
 class Weapons:
     def __init__(self,data:dict) -> None:
@@ -134,7 +134,7 @@ class Maps:
         self.type = data["type"]
         self.attributes = data["attributes"]
         self.name = data["metadata"]["name"]
-        self.imgUrl = data["metadata"]["imageUrl"]
+        self.imageUrl = data["metadata"]["imageUrl"]
         self.rounds = data["stats"]["rounds"]["displayValue"]
         self.wins = data["stats"]["wins"]["displayValue"]
 
