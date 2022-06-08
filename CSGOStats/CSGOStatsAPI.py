@@ -1,6 +1,6 @@
 """
 To use:
-        CSGOStatsplatformInfo
+        CSGOStats.platformInfo
         CSGOStats.overview
         CSGOStats.weapons
         CSGOStats.maps
