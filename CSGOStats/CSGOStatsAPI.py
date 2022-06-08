@@ -9,18 +9,15 @@ To use:
 
 from urllib.request import Request, urlopen
 from bs4 import BeautifulSoup
-import json
+from json import loads
 
 class CSGOStats:
     def __init__(self,name) -> None:
-        self.name = name.replace(" ","+")
+        self.name = name
+        self.nameForSteam = self.name.replace(" ","+")
 
-        self.headers = {
-                'connection': 'keep-alive',
-                'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:73.0) Gecko/20100101 Firefox/73.0'}
-        
         ##########GET STEAM ID##########
-        steam_url = f"https://steamcommunity.com/search/SearchCommunityAjax?text={self.name}&filter=users&sessionid=csgostats&steamid_user=false"
+        steam_url = f"https://steamcommunity.com/search/SearchCommunityAjax?text={self.nameForSteam}&filter=users&sessionid=csgostats&steamid_user=false"
         req = self._get(steam_url, True)
         soup_object = BeautifulSoup(req, "lxml")
         self.steam_id = soup_object.find_all("a")[0].get("href").split("/")[-1][:-2]
@@ -38,9 +35,8 @@ class CSGOStats:
         response = urlopen(req)
         assert not response.getcode() == 451, "The player either hasn't played CSGO or their profile is private."
         data = response.read()
-        if steam:
-            return data.decode("utf-8") 
-        else: return  json.loads(data.decode('utf-8'))
+        if steam: return data.decode("utf-8") 
+        else: return loads(data.decode('utf-8'))
 
     def refresh_informations_platformInfo(self) -> None:
         """Refresh platform informations"""
