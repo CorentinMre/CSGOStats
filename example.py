@@ -1,5 +1,3 @@
-
-from pyxel import pal
 import CSGOStats
 
 
