@@ -1,7 +1,14 @@
-import requests
+"""
+To use:
+        CSGOStatsplatformInfo
+        CSGOStats.overview
+        CSGOStats.weapons
+        CSGOStats.maps
+
+"""
+
 import urllib
 from bs4 import BeautifulSoup
-import re
 import json
 
 class CSGOStats:
@@ -14,8 +21,8 @@ class CSGOStats:
         
         ##########GET STEAM ID##########
         steam_url = f"https://steamcommunity.com/search/SearchCommunityAjax?text={self.name}&filter=users&sessionid=csgostats&steamid_user=false"
-        site_resp = requests.get(steam_url,headers=self.headers,cookies={"sessionid":"csgostats"})
-        soup_object = BeautifulSoup(site_resp.text, "lxml")
+        req = self._get(steam_url, True)
+        soup_object = BeautifulSoup(req, "lxml")
         self.steam_id = soup_object.find_all("a")[0].get("href").split("/")[-1][:-2]
 
         self.link = f"https://tracker.gg/csgo/profile/steam/{self.steam_id}/overview"
@@ -23,32 +30,40 @@ class CSGOStats:
         self.url_weapons = f"https://api.tracker.gg/api/v2/csgo/standard/profile/steam/{self.steam_id}/segments/weapon"
         self.url_maps = f"https://api.tracker.gg/api/v2/csgo/standard/profile/steam/{self.steam_id}/segments/map"
 
-    def _get(self, url:str) -> dict:
+
+    def _get(self, url:str, steam:bool = False) -> dict:
         req = urllib.request.Request(url)
         req.add_header('User-Agent', 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:73.0) Gecko/20100101 Firefox/73.0')
+        req.add_header("Cookie", "sessionid=csgostats")
         response = urllib.request.urlopen(req)
         assert not response.getcode() == 451, "The player either hasn't played CSGO or their profile is private."
         data = response.read()
-        html = json.loads(data.decode('utf-8'))
-        return html["data"]
+        if steam:
+            return data.decode("utf-8") 
+        else: return  json.loads(data.decode('utf-8'))
 
     def refresh_informations_platformInfo(self) -> dict:
         """Refresh platform informations"""
-        self.platformInfo = self._get(self.url_overview)["platformInfo"]
+        self.platformInfo = PlatformInfo(self._get(self.url_overview)["data"]["platformInfo"])
 
 
     def refresh_informations_overview(self) -> dict:
         """Refresh overview informations"""
-        self.overview = self._get(self.url_overview)["segments"][0]["stats"]
+        self.overview = Overview(self._get(self.url_overview)["data"]["segments"][0]["stats"])
 
-    
     def refresh_informations_weapons(self) -> dict:
         """Refresh weapons informations"""
-        self.weapons = self._get(self.url_weapons)
+        self.weapons = []
+        weapons_temp = self._get(self.url_weapons)["data"]
+        for i in range(len(weapons_temp)):
+            self.weapons.append(Weapons(weapons_temp[i]))
 
     def refresh_informations_maps(self) -> dict:
         """Refresh maps informations"""
-        self.maps = self._get(self.url_maps)
+        self.maps = []
+        maps_temp = self._get(self.url_maps)["data"]
+        for i in range(len(maps_temp)):
+            self.maps.append(Maps(maps_temp[i]))
     
     def refresh_all_informations(self) -> None:
         """Refresh all informations"""
@@ -58,75 +73,76 @@ class CSGOStats:
         self.refresh_informations_maps()
     
 
-"""
+class PlatformInfo:
+    def __init__(self,data:dict) -> None:
+        self.platformSlug = data["platformSlug"]
+        self.platformUserId = data["platformUserId"]
+        self.platformUserHandle = data["platformUserHandle"]
+        self.avatarUrl = data["avatarUrl"]
 
-->self.platformInfo 
-    Return platform informations
+class Values:
+    def __init__(self,data:dict) -> None:
+        self.percentile = data["percentile"]
+        self.name = data["displayName"]
+        self.category = data["displayCategory"]
+        self.value = data["displayValue"]
 
-    dict with   'platformSlug'
-                'platformUserId'
-                'platformUserHandle'
-                'platformUserIdentifier'
-                'avatarUrl'
+class Overview:
+    def __init__(self, data:dict) -> None:
+        self.timePlayed = Values(data["timePlayed"])
+        self.score = Values(data["score"])
+        self.kills = Values(data["kills"])
+        self.deaths = Values(data["deaths"])
+        self.kd = Values(data["kd"])
+        self.damage = Values(data["damage"])
+        self.headshots = Values(data["headshots"])
+        self.dominations = Values(data["dominations"])
+        self.shotsFired = Values(data["shotsFired"])
+        self.shotsHit = Values(data["shotsHit"])
+        self.shotsAccuracy = Values(data["shotsAccuracy"])
+        self.snipersKilled = Values(data["snipersKilled"])
+        self.dominationOverkills = Values(data["dominationOverkills"])
+        self.dominationRevenges = Values(data["dominationRevenges"])
+        self.bombsPlanted = Values(data["bombsPlanted"])
+        self.bombsDefused = Values(data["bombsDefused"])
+        self.moneyEarned = Values(data["moneyEarned"])
+        self.hostagesRescued = Values(data["hostagesRescued"])
+        self.mvp = Values(data["mvp"])
+        self.wins = Values(data["wins"])
+        self.ties = Values(data["ties"])
+        self.matchesPlayed = Values(data["matchesPlayed"])
+        self.losses = Values(data["losses"])
+        self.roundsPlayed = Values(data["roundsPlayed"])
+        self.roundsWon = Values(data["roundsWon"])
+        self.wlPercentage = Values(data["wlPercentage"])
+        self.headshotPct = Values(data["headshotPct"])
+
+class Weapons:
+    def __init__(self,data:dict) -> None:
+        self.type = data["type"]
+        self.attributes = data["attributes"]
+        self.name = data["metadata"]["name"]
+        self.imageUrl = data["metadata"]["imageUrl"]
+        self.category = data["metadata"]["category"]
+        self.kills = data["stats"]["kills"]["displayValue"]
+        self.shotsFired = data["stats"]["shotsFired"]["displayValue"]
+        self.shotsHit = data["stats"]["shotsHit"]["displayValue"]
+        self.shotsAccuracy = data["stats"]["shotsAccuracy"]["displayValue"]
+
+class Maps:
+    def __init__(self, data:dict) -> None:
+        self.type = data["type"]
+        self.attributes = data["attributes"]
+        self.name = data["metadata"]["name"]
+        self.imgUrl = data["metadata"]["imageUrl"]
+        self.rounds = data["stats"]["rounds"]["displayValue"]
+        self.wins = data["stats"]["wins"]["displayValue"]
 
 
-->self.overview
-    Return overview informations
-
-    dict with   'timePlayed'
-                'score'
-                'kills'
-                'deaths'
-                'kd'
-                'damage'
-                'headshots'
-                'dominations'
-                'shotsFired'
-                'shotsHit'
-                'shotsAccuracy'
-                'snipersKilled'
-                'dominationOverkills'
-                'dominationRevenges'
-                'bombsDefused'
-                'moneyEarned'
-                'hostagesRescued'
-                'mvp'
-                'wins'
-                'ties'
-                'matchesPlayed'
-                'losses'
-                'roundsPlayed'
-                'roundsWon'
-                'wlPercentage'
-                'headshotPct'
-
-
-->self.weapons
-    Return weapons informations
-
-    list of dict with 0
-                      1
-                      2
-                      3
-                      4...
-
-
-->self.maps
-    Return maps informations
-
-    list of dict  0
-                  1
-                  2
-                  3
-                  4...
-        
-"""
 if __name__ == "__main__":
 
-    player = CSGOStats("footsx")
+    player = CSGOStats("Ritchi92")
     player.refresh_all_informations()
 
-    print(player.platformInfo)
-    print(player.overview)
-    print(player.weapons)
-    print(player.maps)
+
+    print(player.overview.kd.value)
