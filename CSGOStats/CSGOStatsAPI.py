@@ -7,7 +7,7 @@ To use:
 
 """
 
-import urllib
+from urllib.request import Request, urlopen
 from bs4 import BeautifulSoup
 import json
 
@@ -32,10 +32,10 @@ class CSGOStats:
 
 
     def _get(self, url:str, steam:bool = False) -> dict:
-        req = urllib.request.Request(url)
+        req = Request(url)
         req.add_header('User-Agent', 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:73.0) Gecko/20100101 Firefox/73.0')
         req.add_header("Cookie", "sessionid=csgostats")
-        response = urllib.request.urlopen(req)
+        response = urlopen(req)
         assert not response.getcode() == 451, "The player either hasn't played CSGO or their profile is private."
         data = response.read()
         if steam:

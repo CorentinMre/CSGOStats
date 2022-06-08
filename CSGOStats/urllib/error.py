@@ -11,7 +11,7 @@ an application may want to handle an exception like a regular
 response.
 """
 
-import urllib.response
+from . import response
 
 __all__ = ['URLError', 'HTTPError', 'ContentTooShortError']
 
@@ -32,9 +32,9 @@ class URLError(OSError):
         return '<urlopen error %s>' % self.reason
 
 
-class HTTPError(URLError, urllib.response.addinfourl):
+class HTTPError(URLError, response.addinfourl):
     """Raised when HTTP error occurs, but also acts like non-error return"""
-    __super_init = urllib.response.addinfourl.__init__
+    __super_init = response.addinfourl.__init__
 
     def __init__(self, url, code, msg, hdrs, fp):
         self.code = code

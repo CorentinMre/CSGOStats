@@ -11,8 +11,9 @@
 """
 
 import collections
-import urllib.parse
-import urllib.request
+import parse
+import request
+import error
 
 __all__ = ["RobotFileParser"]
 
@@ -54,13 +55,13 @@ class RobotFileParser:
     def set_url(self, url):
         """Sets the URL referring to a robots.txt file."""
         self.url = url
-        self.host, self.path = urllib.parse.urlparse(url)[1:3]
+        self.host, self.path = parse.urlparse(url)[1:3]
 
     def read(self):
         """Reads the robots.txt URL and feeds it to the parser."""
         try:
-            f = urllib.request.urlopen(self.url)
-        except urllib.error.HTTPError as err:
+            f = request.urlopen(self.url)
+        except error.HTTPError as err:
             if err.code in (401, 403):
                 self.disallow_all = True
             elif err.code >= 400 and err.code < 500:
@@ -111,7 +112,7 @@ class RobotFileParser:
             line = line.split(':', 1)
             if len(line) == 2:
                 line[0] = line[0].strip().lower()
-                line[1] = urllib.parse.unquote(line[1].strip())
+                line[1] = parse.unquote(line[1].strip())
                 if line[0] == "user-agent":
                     if state == 2:
                         self._add_entry(entry)
@@ -165,10 +166,10 @@ class RobotFileParser:
             return False
         # search for given user agent matches
         # the first match counts
-        parsed_url = urllib.parse.urlparse(urllib.parse.unquote(url))
-        url = urllib.parse.urlunparse(('','',parsed_url.path,
+        parsed_url = parse.urlparse(parse.unquote(url))
+        url = parse.urlunparse(('','',parsed_url.path,
             parsed_url.params,parsed_url.query, parsed_url.fragment))
-        url = urllib.parse.quote(url)
+        url = parse.quote(url)
         if not url:
             url = "/"
         for entry in self.entries:
@@ -219,8 +220,8 @@ class RuleLine:
         if path == '' and not allowance:
             # an empty value means allow all
             allowance = True
-        path = urllib.parse.urlunparse(urllib.parse.urlparse(path))
-        self.path = urllib.parse.quote(path)
+        path = parse.urlunparse(parse.urlparse(path))
+        self.path = parse.quote(path)
         self.allowance = allowance
 
     def applies_to(self, filename):
