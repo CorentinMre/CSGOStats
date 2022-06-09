@@ -4,11 +4,8 @@ To use:
         CSGOStats.overview
         CSGOStats.weapons
         CSGOStats.maps
-
 """
 
-from email import header
-from http.cookiejar import Cookie
 import requests
 from bs4 import BeautifulSoup
 from json import loads
