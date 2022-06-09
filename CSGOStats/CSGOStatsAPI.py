@@ -17,6 +17,9 @@ class CSGOStats:
 
         self.apiKey = apiKey
 
+        if self.apiKey is None: self.urlhost = "api.tracker.gg/api"
+        else: self.urlhost = "public-api.tracker.gg"
+
         ##########GET STEAM ID##########
         steam_url = f"https://steamcommunity.com/search/SearchCommunityAjax?text={self.nameForSteam}&filter=users&sessionid=csgostats&steamid_user=false"
         req = self._get(steam_url, True, {"sessionid": "csgostats"})
@@ -24,10 +27,9 @@ class CSGOStats:
         self.steam_id = soup_object.find_all("a")[0].get("href").split("/")[-1][:-2]
 
         self.link = f"https://tracker.gg/csgo/profile/steam/{self.steam_id}/overview"
-        self.url_overview = f"https://api.tracker.gg/api/v2/csgo/standard/profile/steam/{self.steam_id}"
-        self.url_weapons = f"https://api.tracker.gg/api/v2/csgo/standard/profile/steam/{self.steam_id}/segments/weapon"
-        self.url_maps = f"https://api.tracker.gg/api/v2/csgo/standard/profile/steam/{self.steam_id}/segments/map"
-
+        self.url_overview = f"https://{self.urlhost}/v2/csgo/standard/profile/steam/{self.steam_id}"
+        self.url_weapons = f"https://{self.urlhost}/v2/csgo/standard/profile/steam/{self.steam_id}/segments/weapon"
+        self.url_maps = f"https://{self.urlhost}/v2/csgo/standard/profile/steam/{self.steam_id}/segments/map"
 
     def _get(self, url:str, steam:bool = False, cookies:dict = None) -> None:
         if self.apiKey is None: req = requests.get(url, headers={'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:73.0) Gecko/20100101 Firefox/73.0'},cookies=cookies)
