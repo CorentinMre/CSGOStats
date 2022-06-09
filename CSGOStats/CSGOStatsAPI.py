@@ -11,9 +11,11 @@ from bs4 import BeautifulSoup
 from json import loads
 
 class CSGOStats:
-    def __init__(self,name) -> None:
+    def __init__(self, name, apiKey = None) -> None:
         self.name = name
         self.nameForSteam = self.name.replace(" ","+")
+
+        self.apiKey = apiKey
 
         ##########GET STEAM ID##########
         steam_url = f"https://steamcommunity.com/search/SearchCommunityAjax?text={self.nameForSteam}&filter=users&sessionid=csgostats&steamid_user=false"
@@ -28,7 +30,8 @@ class CSGOStats:
 
 
     def _get(self, url:str, steam:bool = False, cookies:dict = None) -> None:
-        req = requests.get(url, headers={'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:73.0) Gecko/20100101 Firefox/73.0'},cookies=cookies)
+        if self.apiKey is None: req = requests.get(url, headers={'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:73.0) Gecko/20100101 Firefox/73.0'},cookies=cookies)
+        else: req = requests.get(url, headers={'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:73.0) Gecko/20100101 Firefox/73.0'},cookies=cookies, params={"TRN-Api-Key": self.apiKey})
         assert not req.status_code == 451, "The player either hasn't played CSGO or their profile is private."
         assert not req.status_code == 403, "Access to the api is denied"
         if steam: return req.text

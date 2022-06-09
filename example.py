@@ -1,6 +1,11 @@
 import CSGOStats
 
+#if you use python 3.10.5 or higher, you can use the following line:
 player = CSGOStats.CSGOStats("FootSX")
+#or you can use the following line:
+#player = CSGOStats.CSGOStats("FootSX", "<your_api_key>")
+
+
 player.refresh_all_informations()
 
 """TO OPTIMIZE
