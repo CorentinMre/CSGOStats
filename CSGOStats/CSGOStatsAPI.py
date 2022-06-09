@@ -7,7 +7,7 @@ To use:
 
 """
 
-from urllib.request import Request, urlopen
+import requests
 from bs4 import BeautifulSoup
 from json import loads
 
@@ -29,14 +29,11 @@ class CSGOStats:
 
 
     def _get(self, url:str, steam:bool = False) -> dict:
-        req = Request(url)
-        req.add_header('User-Agent', 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:73.0) Gecko/20100101 Firefox/73.0')
-        req.add_header("Cookie", "sessionid=csgostats")
-        response = urlopen(req)
-        assert not response.getcode() == 451, "The player either hasn't played CSGO or their profile is private."
-        data = response.read()
-        if steam: return data.decode("utf-8") 
-        else: return loads(data.decode('utf-8'))
+        req = requests.get(url, headers={'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:73.0) Gecko/20100101 Firefox/73.0'},cookies={'sessionid': 'csgostats'})
+        assert not req.status_code == 451, "The player either hasn't played CSGO or their profile is private."
+        assert not req.status_code == 403, "Access to the api is denied"
+        if steam: return req.text
+        else: return loads(req.text)
 
     def refresh_informations_platformInfo(self) -> None:
         """Refresh platform informations"""
