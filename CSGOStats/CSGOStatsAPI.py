@@ -7,6 +7,8 @@ To use:
 
 """
 
+from email import header
+from http.cookiejar import Cookie
 import requests
 from bs4 import BeautifulSoup
 from json import loads
@@ -29,7 +31,9 @@ class CSGOStats:
 
 
     def _get(self, url:str, steam:bool = False) -> dict:
-        req = requests.get(url, headers={'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:73.0) Gecko/20100101 Firefox/73.0'},cookies={'sessionid': 'csgostats'})
+        headers = {'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:73.0) Gecko/20100101 Firefox/73.0'}
+        cookies = {'sessionid': 'csgostats',"__cf_bm":"Du_13663.5DJOhYUYdvdKf9Pnm41J7eUWJf4iqQHSuY-1654795290-0-AeoQqUkZPkbJc/qrqIe8+ZYTpZntIFeCDOr5835/8NoBw5T11Dq7hot3s7sWQLpzo5u3Wk8c9+rkHFJuGBB8kLA="}
+        req = requests.get(url, headers=headers,cookies=cookies)
         assert not req.status_code == 451, "The player either hasn't played CSGO or their profile is private."
         assert not req.status_code == 403, "Access to the api is denied"
         if steam: return req.text
