@@ -17,7 +17,7 @@ class CSGOStats:
 
         ##########GET STEAM ID##########
         steam_url = f"https://steamcommunity.com/search/SearchCommunityAjax?text={self.nameForSteam}&filter=users&sessionid=csgostats&steamid_user=false"
-        req = self._get(steam_url, True)
+        req = self._get(steam_url, True, {"sessionid": "csgostats"})
         soup_object = BeautifulSoup(req, "lxml")
         self.steam_id = soup_object.find_all("a")[0].get("href").split("/")[-1][:-2]
 
@@ -27,10 +27,8 @@ class CSGOStats:
         self.url_maps = f"https://api.tracker.gg/api/v2/csgo/standard/profile/steam/{self.steam_id}/segments/map"
 
 
-    def _get(self, url:str, steam:bool = False) -> dict:
-        headers = {'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:73.0) Gecko/20100101 Firefox/73.0'}
-        cookies = {'sessionid': 'csgostats',"__cf_bm":"Du_13663.5DJOhYUYdvdKf9Pnm41J7eUWJf4iqQHSuY-1654795290-0-AeoQqUkZPkbJc/qrqIe8+ZYTpZntIFeCDOr5835/8NoBw5T11Dq7hot3s7sWQLpzo5u3Wk8c9+rkHFJuGBB8kLA="}
-        req = requests.get(url, headers=headers,cookies=cookies)
+    def _get(self, url:str, steam:bool = False, cookies:dict = None) -> None:
+        req = requests.get(url, headers={'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:73.0) Gecko/20100101 Firefox/73.0'},cookies=cookies)
         assert not req.status_code == 451, "The player either hasn't played CSGO or their profile is private."
         assert not req.status_code == 403, "Access to the api is denied"
         if steam: return req.text
