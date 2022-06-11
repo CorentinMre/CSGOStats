@@ -17,8 +17,7 @@ class CSGOStats:
 
         self.apiKey = apiKey
 
-        if self.apiKey is None: self.urlhost = "api.tracker.gg/api"
-        else: self.urlhost = "public-api.tracker.gg"
+        
 
         ##########GET STEAM ID##########
         steam_url = f"https://steamcommunity.com/search/SearchCommunityAjax?text={self.nameForSteam}&filter=users&sessionid=csgostats&steamid_user=false"
@@ -26,27 +25,40 @@ class CSGOStats:
         soup_object = BeautifulSoup(req, "lxml")
         self.steam_id = soup_object.find_all("a")[0].get("href").split("/")[-1][:-2]
 
+        if self.apiKey is None: 
+            self.urlhost = "api.tracker.gg/api"
+            self.trackerParams = "?" + self._get_tracker_params(f"https://{self.urlhost}/v2/csgo/standard/profile/steam/{self.steam_id}")
+        else: 
+            self.urlhost = "public-api.tracker.gg"
+            self.trackerParams = ""
+
         self.link = f"https://tracker.gg/csgo/profile/steam/{self.steam_id}/overview"
-        self.url_overview = f"https://{self.urlhost}/v2/csgo/standard/profile/steam/{self.steam_id}"
-        self.url_weapons = f"https://{self.urlhost}/v2/csgo/standard/profile/steam/{self.steam_id}/segments/weapon"
-        self.url_maps = f"https://{self.urlhost}/v2/csgo/standard/profile/steam/{self.steam_id}/segments/map"
+        self.url_overview = f"http://{self.urlhost}/v2/csgo/standard/profile/steam/{self.steam_id}{self.trackerParams}"
+        self.url_weapons = f"http://{self.urlhost}/v2/csgo/standard/profile/steam/{self.steam_id}/segments/weapon{self.trackerParams}"
+        self.url_maps = f"http://{self.urlhost}/v2/csgo/standard/profile/steam/{self.steam_id}/segments/map{self.trackerParams}"
+
+        
+    def _get_tracker_params(self, url:str) -> str:
+        req = requests.get(url)
+        return BeautifulSoup(req.text, "lxml").find("form",{"class":"challenge-form managed-form"}).get("action").split("?")[-1]
 
     def _get(self, url:str, steam:bool = False, cookies:dict = None) -> None:
         if self.apiKey is None: req = requests.get(url, headers={'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:73.0) Gecko/20100101 Firefox/73.0'},cookies=cookies)
-        else: req = requests.get(url, headers={'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:73.0) Gecko/20100101 Firefox/73.0'},cookies=cookies, params={"TRN-Api-Key": self.apiKey})
+        else: req = requests.get(url, headers={'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:73.0) Gecko/20100101 Firefox/73.0', "TRN-Api-Key":self.apiKey},cookies=cookies)
         assert not req.status_code == 451, "The player either hasn't played CSGO or their profile is private."
         assert not req.status_code == 403, "Access to the api is denied"
         if steam: return req.text
-        else: return loads(req.text)
-
-    def refresh_informations_platformInfo(self) -> None:
-        """Refresh platform informations"""
-        self.platformInfo = PlatformInfo(self._get(self.url_overview)["data"]["platformInfo"])
+        else:
+            if list(loads(req.text).keys())[0] == 'message': raise Exception("API rate limit exceeded")
+            else: return loads(req.text)
 
 
-    def refresh_informations_overview(self) -> None:
+
+    def refresh_informations_profil(self) -> None:
         """Refresh overview informations"""
-        self.overview = Overview(self._get(self.url_overview)["data"]["segments"][0]["stats"])
+        data = self._get(self.url_overview)
+        self.overview = Overview(data["data"]["segments"][0]["stats"])
+        self.platformInfo = PlatformInfo(data["data"]["platformInfo"])
 
     def refresh_informations_weapons(self) -> None:
         """Refresh weapons informations"""
@@ -64,8 +76,7 @@ class CSGOStats:
     
     def refresh_all_informations(self) -> None:
         """Refresh all informations"""
-        self.refresh_informations_platformInfo()
-        self.refresh_informations_overview()
+        self.refresh_informations_profil()
         self.refresh_informations_weapons()
         self.refresh_informations_maps()
     

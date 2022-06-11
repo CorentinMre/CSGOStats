@@ -11,10 +11,9 @@ player.refresh_all_informations()
 """TO OPTIMIZE
 #If you want to refresh informations
 
-player.refresh_informations_platformInfo()
-player.refresh_informations_overview()
-player.refresh_informations_weapons()
-player.refresh_informations_maps()
+player.refresh_informations_profil() #Refresh overview and platformInfo informations
+player.refresh_informations_weapons() #Refresh weapons informations
+player.refresh_informations_maps() #Refresh maps informations
 
 #Or more simply
 
