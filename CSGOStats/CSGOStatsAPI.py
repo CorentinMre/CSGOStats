@@ -17,13 +17,22 @@ class CSGOStats:
 
         self.apiKey = apiKey
 
-        
-
         ##########GET STEAM ID##########
         steam_url = f"https://steamcommunity.com/search/SearchCommunityAjax?text={self.nameForSteam}&filter=users&sessionid=csgostats&steamid_user=false"
-        req = self._get(steam_url, True, {"sessionid": "csgostats"})
-        soup_object = BeautifulSoup(req, "lxml")
-        self.steam_id = soup_object.find_all("a")[0].get("href").split("/")[-1][:-2]
+        req = self._get(steam_url,cookies= {"sessionid": "csgostats"})
+        responce = req["html"]
+        soup_object = BeautifulSoup(responce, "html.parser").find_all("a", {"class":"searchPersonaName"})
+        indexPlayer = 0
+        nbPlayerFound = 0
+        if len(soup_object) == 0: raise Exception("Player not found")
+        elif len(soup_object) > 1:
+            for i in range(len(soup_object)):
+                if soup_object[i].text.lower() == self.name.lower():
+                    nbPlayerFound += 1 
+                    indexPlayer = i
+
+        if nbPlayerFound > 1: raise Exception("Multiple player found")
+        self.steam_id = soup_object[indexPlayer].get("href").split("/")[-1]
 
         if self.apiKey is None: 
             self.urlhost = "api.tracker.gg/api"
@@ -40,7 +49,7 @@ class CSGOStats:
         
     def _get_tracker_params(self, url:str) -> str:
         req = requests.get(url)
-        return BeautifulSoup(req.text, "lxml").find("form",{"class":"challenge-form managed-form"}).get("action").split("?")[-1]
+        return BeautifulSoup(req.text, "html.parser").find("form",{"class":"challenge-form managed-form"}).get("action").split("?")[-1]
 
     def _get(self, url:str, steam:bool = False, cookies:dict = None) -> None:
         if self.apiKey is None: req = requests.get(url, headers={'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:73.0) Gecko/20100101 Firefox/73.0'},cookies=cookies)
