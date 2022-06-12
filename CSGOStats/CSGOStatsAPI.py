@@ -46,7 +46,7 @@ class CSGOStats:
         if self.apiKey is None: req = requests.get(url, headers={'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:73.0) Gecko/20100101 Firefox/73.0'},cookies=cookies)
         else: req = requests.get(url, headers={'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:73.0) Gecko/20100101 Firefox/73.0', "TRN-Api-Key":self.apiKey},cookies=cookies)
         assert not req.status_code == 451, "The player either hasn't played CSGO or their profile is private."
-        assert not req.status_code == 403, "Access to the api is denied. (It is possible that you are not using the recommended version of python, use the 3.10.5 version)"
+        assert not req.status_code == 403, "Access to the api is denied. (It is possible that you are not using the recommended version of python, use python version 3.9 or newer)"
         if steam: return req.text
         else:
             if list(loads(req.text).keys())[0] == 'message': raise Exception("API rate limit exceeded")

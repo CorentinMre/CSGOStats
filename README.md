@@ -5,9 +5,9 @@
 
 <h2 align="center">CSGO Statistics</h2>
 <br/>
-<h4 align="center">** Use the latest version of python (3.10.5) <a target="_blank" href="https://www.python.org">Python</a> **</h4>
-<h4 align="center">** <a target="_blank" href="https://www.python.org/ftp/python/3.10.5/python-3.10.5-amd64.exe">For Windows</a> **</h4>
-<h4 align="center"> If you don't have python 3.10.5 we can be use but you do to give your <a target="_blank" href="https://tracker.gg/developers/docs/getting-started">tracker.gg</a> API KEY </h4>
+<h4 align="center">** Use python version 3.9 or newer <a target="_blank" href="https://www.python.org">Python</a> **</h4>
+<h4 align="center">** Latest version of python: <a target="_blank" href="https://www.python.org/ftp/python/3.10.5/python-3.10.5-amd64.exe">For Windows</a> **</h4>
+<h4 align="center"> If you don't have python 3.9 or newer we can be use but you do to give your <a target="_blank" href="https://tracker.gg/developers/docs/getting-started">tracker.gg</a> API KEY </h4>
 <br/>
 
 ## Requirements
