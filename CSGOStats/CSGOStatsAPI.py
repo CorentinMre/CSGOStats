@@ -8,7 +8,6 @@ To use:
 
 import requests
 from bs4 import BeautifulSoup
-from json import loads
 
 class CSGOStats:
     def __init__(self, name, apiKey = None) -> None:
@@ -34,22 +33,19 @@ class CSGOStats:
         if nbPlayerFound > 1: raise Exception("Multiple player found")
         self.steam_id = soup_object[indexPlayer].get("href").split("/")[-1]
 
+        self.trackerParams = "?__cf_chl_f_tk=csgoStats"
+
         if self.apiKey is None: 
             self.urlhost = "api.tracker.gg/api"
-            self.trackerParams = "?" + self._get_tracker_params(f"https://{self.urlhost}/v2/csgo/standard/profile/steam/{self.steam_id}")
         else: 
             self.urlhost = "public-api.tracker.gg"
-            self.trackerParams = ""
 
         self.link = f"https://tracker.gg/csgo/profile/steam/{self.steam_id}/overview"
         self.url_overview = f"http://{self.urlhost}/v2/csgo/standard/profile/steam/{self.steam_id}{self.trackerParams}"
         self.url_weapons = f"http://{self.urlhost}/v2/csgo/standard/profile/steam/{self.steam_id}/segments/weapon{self.trackerParams}"
         self.url_maps = f"http://{self.urlhost}/v2/csgo/standard/profile/steam/{self.steam_id}/segments/map{self.trackerParams}"
 
-        
-    def _get_tracker_params(self, url:str) -> str:
-        req = requests.get(url)
-        return BeautifulSoup(req.text, "html.parser").find("form",{"class":"challenge-form managed-form"}).get("action").split("?")[-1]
+
 
     def _get(self, url:str, steam:bool = False, cookies:dict = None) -> None:
         if self.apiKey is None: req = requests.get(url, headers={'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:73.0) Gecko/20100101 Firefox/73.0'},cookies=cookies)
@@ -58,8 +54,8 @@ class CSGOStats:
         assert not req.status_code == 403, "Access to the api is denied. (It is possible that you are not using the recommended version of python, use python version 3.9 or newer)"
         if steam: return req.text
         else:
-            if list(loads(req.text).keys())[0] == 'message': raise Exception("API rate limit exceeded")
-            else: return loads(req.text)
+            if list(req.json().keys())[0] == 'message': raise Exception("API rate limit exceeded")
+            else: return req.json()
 
 
 
